@@ -121,8 +121,8 @@ mlflow run . -e train -P n_estimators=200 -P max_depth=10 --env-manager local
 ```
 
 
-### Day 29
 
+### Day 29
 Fix MLflow's Remote Artifact-Store Wiring (PostgreSQL + SeaweedFS)
 
 
@@ -145,4 +145,38 @@ exec mlflow server \
   --host 0.0.0.0 --port 5000 \
   --allowed-hosts '*' --cors-allowed-origins '*'
 
+```
+
+
+### Day 30
+End-to-End MLflow: Register, Serve, and Monitor the Champion
+
+
+
+Register the model from the UI , with given format & criteria
+
+```shell
+export MLFLOW_TRACKING_URI=http://localhost:5000
+
+mlflow models serve -m models:/fraud-detector-v2/1 -p 5001 --env-manager=local
+```
+
+
+```curl localhost:5001/health -vvv```
+
+
+**monitor.sh**
+
+```shell
+#!/usr/bin/env bash
+set -u
+
+URL="http://127.0.0.1:5001/health"
+
+code=$(curl -s -o /dev/null -w '%{http_code}' "$URL")
+if [ "$code" = "200" ]; then
+  exit 0
+else
+  exit 1
+fi
 ```
