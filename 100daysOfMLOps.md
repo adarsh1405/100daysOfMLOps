@@ -180,3 +180,53 @@ else
   exit 1
 fi
 ```
+
+
+
+### Day 31
+Fix a Broken Config-Driven Training Setup
+
+Edit in **train_config.yaml**
+```yaml
+type: RandomForestClassifier
+```
+```yaml
+data:
+  target_column: is_fraud
+```
+```yaml
+output:
+  model_path: /root/code/fraud-detection/models/model.pkl
+```
+
+
+### Day 32
+Make a Training Script Reproducible (Seed Discipline)
+
+
+```python
+# Added random_state in split & model calling
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, stratify=y, random_state=42
+    )
+
+    model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=42)
+```
+
+### Day 33
+Fix a Broken Evaluation Script and Metrics Report
+
+update the `train.py`
+
+```python
+METRICS_JSON = os.path.join(REPORTS_DIR, "metrics.json")
+```
+```python
+    metrics = {
+        "accuracy": round(accuracy_score(y, preds), 6),
+        "precision": round(precision_score(y, preds), 6),
+        "recall": round(recall_score(y, preds), 6),
+        "f1_score": round(f1_score(y, preds), 6),
+        "auc_roc": round(roc_auc_score(y, preds), 6)
+    }
+```
