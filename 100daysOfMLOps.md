@@ -230,3 +230,44 @@ METRICS_JSON = os.path.join(REPORTS_DIR, "metrics.json")
         "auc_roc": round(roc_auc_score(y, preds), 6)
     }
 ```
+
+
+
+
+### Day 34
+Fix a Broken Cross-Validation Loop (Stratified + Aggregates)
+```python
+# TODO 1
+fold = {
+    "fold": fold_idx,
+    "accuracy": round(accuracy_score(y_test, preds), 6),
+    "f1": round(f1_score(y_test, preds), 6),
+    "roc_auc": round(roc_auc_score(y_test, proba), 6),
+}
+
+# TODO 2
+with mlflow.start_run(run_name=f"fold-{fold_idx}", nested=True):
+    mlflow.log_param("fold", fold_idx)
+    mlflow.log_metric("accuracy", fold["accuracy"])
+    mlflow.log_metric("f1", fold["f1"])
+    mlflow.log_metric("roc_auc", fold["roc_auc"])
+```
+
+
+
+### Day 35 (Important)
+Fix a Broken Optuna Tuner with MLflow Logging
+
+```python
+# Fix 1 : Track the log for each trial
+with mlflow.start_run():
+        mlflow.log_param("n_estimators", n_estimators)
+        mlflow.log_param("max_depth", max_depth)
+        mlflow.log_metric("f1_score", score)
+```
+
+```python
+# Fix 2: Replace the minimize to maxmimze , as we need the value for the highest
+study = optuna.create_study(direction="maximize", study_name=EXPERIMENT_NAME)
+```
+
