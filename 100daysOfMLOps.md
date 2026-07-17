@@ -271,3 +271,57 @@ with mlflow.start_run():
 study = optuna.create_study(direction="maximize", study_name=EXPERIMENT_NAME)
 ```
 
+
+
+
+### Day 36
+Fix a Multi-Model Bake-Off in the MLflow Compare View
+
+
+```python
+    # Replace ASC to DESC as we need the highest f1_score
+    runs = mlflow.search_runs(
+        experiment_ids=[exp.experiment_id],
+        order_by=["metrics.f1_score DESC"],
+        max_results=10,
+    )
+```
+```python
+    winner = runs.iloc[0]
+    report = {
+        "run_id": winner["run_id"],
+        "f1_score": float(winner["metrics.f1_score"]),
+        # Added the model_type to the json
+        "model_type": winner["tags.mlflow.runName"]
+    }
+```
+
+
+
+### Day 37 (Important)
+Fix a Four-Stage Training Pipeline's Inter-Stage Wiring
+
+```python
+# featurize.py
+input_path = config["data"]["processed_path"]
+```
+```python
+train.py
+features_path = config["data"]["features_path"]
+```
+
+```python
+# run_pipeline.py
+# TODO 1
+mlflow.log_param("model_type",config["model"]["type"])
+mlflow.log_param("n_estimators",config["model"]["n_estimators"])
+mlflow.log_param("max_depth",config["model"]["max_depth"])
+
+
+# TODO 2
+metrics = config["output"]["report_path"]
+with open(metrics, "r") as file:
+    data = json.load(file)
+mlflow.log_metrics(data)
+
+```
