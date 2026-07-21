@@ -325,3 +325,168 @@ with open(metrics, "r") as file:
 mlflow.log_metrics(data)
 
 ```
+
+
+
+### Day 38:
+Fix a Parallel-Training Bake-Off (n_jobs Backend)
+
+
+```python
+# train.py
+N_JOBS_VALUES = [1, -1]
+mlflow.log_param("n_jobs", n_jobs)
+
+
+with mlflow.start_run(run_name="speedup-summary"):
+        mlflow.log_metric("speedup",(times[1] / times[-1]))
+```
+
+
+### Day 39: (Good one) - you can run on CPU or in GPU based upon your needs
+Make a PyTorch Trainer Device-Aware with Checkpointing
+
+```python
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
+model = model.to(device)
+
+
+mlflow.log_param("device", device)
+xb = X_t.to(device)
+yb = y_t.to(device)
+
+```
+```python
+# TODO
+if epoch % 10 == 0:
+    torch.save(
+    {'epoach': epoch,
+    'model_state_dict': model.state_dict(),
+    'optimizer_state_dict': optimizer.state_dict(),
+    'loss': final_loss
+    },
+    os.path.join(CHECKPOINT_DIR,f"ckpt_epoch_{epoch}.pt")
+    )
+
+```
+
+
+### Day 40: 
+Fix and Complete a Five-Stage Training Capstone
+
+
+
+```shell
+  # Makefile
+  # Re-arrange the file 
+  python3 src/validate_data.py
+  python3 src/tune.py
+  python3 src/select_model.py
+  python3 src/register.py
+  python3 src/report.py
+```
+
+```python
+# select_model.py
+# Replaced accuracy to f1_score 
+runs = mlflow.search_runs(
+      experiment_ids=[exp.experiment_id],
+      order_by=["metrics.f1_score DESC"],
+      max_results=200,
+  )
+
+score = float(best["metrics.f1_score"])
+
+```
+
+```python
+# register.py
+# TODO
+client.set_registered_model_alias(REGISTERED_MODEL_NAME, RELEASE_ALIAS, version.version)
+```
+
+```python
+# report.py
+report = {
+    "best_model": selection["model_type"],
+    "best_params": best_params,
+    "metrics": best_metrics,
+    "total_trials": total_trials,
+    "validation_status": validation["status"]
+}
+```
+
+
+### Day 41
+Scaffold a Feast Feature Repository and Build a Training Set
+
+```shell
+feast init feature_repo
+cd feature_repo/feature_repo
+feast apply
+```
+
+```shell
+feast ui & // to run the Feast UI
+```
+
+
+```python
+# replace training_df line with this 
+training_df = store.get_historical_features(entity_df=entity_df, features=["driver_hourly_stats:conv_rate", "driver_hourly_stats:acc_rate", "driver_hourly_stats:avg_daily_trips"]).to_df()
+
+```
+
+``` shell
+python  build_training_set.py 
+```
+
+### Day 42
+Define a Feast Feature View (Entity + Field Schema)
+
+```python
+join_keys=["customer_id"],
+```
+```python 
+Field(name="hour", dtype=Int64),
+Field(name="num_tx_past_day", dtype=Int64),
+```
+
+
+
+
+### Day 43
+
+
+```shell
+# ./materialize.sh
+END_DATE="2026-01-01T00:00:00"
+```
+
+
+```python
+# fetch_features.py
+result = store.get_online_features(
+    features=[
+      "customer_transaction_features:amount",
+      "customer_transaction_features:hour",
+      "customer_transaction_features:num_tx_past_day",
+  ] , entity_rows=[{"customer_id": i} for i in range(1, 6)]   
+).to_dict()
+```
+
+### Day 44 
+> Store MLflow's Admin Password in HashiCorp Vault
+
+- Loging to the vault UI (usbing the vault token given to us)
+- Create the Secret Engine (with version: 2)
+- Create a secret in `mlflow` path & create `admin_password` secret with random password
+
+
+### Day 45
+> Authenticate MLflow to Vault via AppRole and Fix Its KV Policy
+
+
+
