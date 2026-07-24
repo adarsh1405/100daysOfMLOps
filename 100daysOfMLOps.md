@@ -485,8 +485,47 @@ result = store.get_online_features(
 - Create a secret in `mlflow` path & create `admin_password` secret with random password
 
 
-### Day 45
+### Day 45 (Hard)
 > Authenticate MLflow to Vault via AppRole and Fix Its KV Policy
 
+- Edit the ACL policy
+```shell
+path "secret/data/mlflow" {
+  capabilities = ["read"]
+}
+```
 
 
+```shell
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=$(cat /root/code/vault-root-token)
+
+vault auth enable approle
+
+vault write auth/approle/role/mlflow \
+  token_policies=mlflow-reader \
+  token_ttl=1h token_max_ttl=4h
+
+```
+
+
+
+### Day 46
+> Author Data-Quality Expectations with Great Expectations
+
+
+```python
+suite.add_expectation(ge.ExpectTableColumnsToMatchSet (column_set=["amount","hour","num_tx_past_day","is_fraud"]))
+```
+
+```python
+suite.add_expectation(ge.ExpectColumnValuesToBeBetween(column="amount" , min_value=0))
+```
+
+```python
+suite.add_expectation(ge.ExpectColumnValuesToBeBetween(column="hour",min_value=0,max_value=23))
+```
+
+```python
+suite.add_expectation(ge.ExpectColumnValuesToBeInSet(column="is_fraud", value_set=[0,1]))
+```
