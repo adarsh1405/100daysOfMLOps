@@ -529,3 +529,87 @@ suite.add_expectation(ge.ExpectColumnValuesToBeBetween(column="hour",min_value=0
 ```python
 suite.add_expectation(ge.ExpectColumnValuesToBeInSet(column="is_fraud", value_set=[0,1]))
 ```
+
+
+
+
+
+### Day 47
+> Debug a Failing Great Expectations Checkpoint
+
+```python
+# replace the 0 with -400 based on the result from the run in UI
+ge.ExpectColumnValuesToBeBetween(column="amount", min_value=-400)
+```
+
+
+### Day 48
+> Enforce a Data-Quality Checkpoint as a Blocking CI Gate
+
+
+Go to the workflow in `.gitea/workflows/data-quality` , & add the below step
+
+```yaml
+- name: running the command 
+  run: python3 -m src.gx_run
+```
+
+```shell
+# commit & push
+git add .
+git commit -m "Added CI"
+git push
+```
+
+### Day 49 (GOOD one )
+> Secrets + Data-Quality Integration Capstone
+
+
+Step 1 : create a mlflow_password inside vault UI
+
+
+Step 2 : 
+```shell
+TOKEN=$(cat /root/code/vault-token)
+PASSWORD=$(curl -sf -H "X-Vault-Token: $TOKEN" \
+  "$VAULT_ADDR/v1/secret/data/mlflow" \
+  | python3 -c "import json, sys; print(json.load(sys.stdin)['data']['data']['mlflow_password'])")
+if [ -z "$PASSWORD" ]; then
+  echo "::error::Empty password from Vault -- stage mlflow_password in secret/mlflow first"
+  exit 1
+fi
+echo "::notice::Fetched MLflow password from Vault (len=${#PASSWORD})"
+
+```
+
+```shell
+# commit & push
+git add .
+git commit -m "Added CI"
+git push
+```
+
+- Create a PR & merge the PR
+- Check the actions , It should be successfully ran
+- login to MLFlow UI , go to model and add Alias as `Production`
+
+
+
+### Day 50
+> Create Docker Image for ML Training Environment
+
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+RUN pip install scikit-learn pandas numpy joblib
+COPY train.py /app/train.py
+CMD ["python3" , "train.py"]
+```
+```shell
+# build the image
+docker build -t ml-trainer:v1 .
+```
+```shell
+# to validate
+docker run --rm ml-trainer:v1 python3 -c "import sklearn, pandas, numpy, joblib; print('OK')" prints OK
+```
