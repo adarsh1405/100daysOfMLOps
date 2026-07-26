@@ -613,3 +613,41 @@ docker build -t ml-trainer:v1 .
 # to validate
 docker run --rm ml-trainer:v1 python3 -c "import sklearn, pandas, numpy, joblib; print('OK')" prints OK
 ```
+
+
+
+### Day 51
+> Create Multi-Stage Docker Build for ML Serving
+
+```dockerfile
+FROM python:3.11-slim AS builder
+WORKDIR /app
+RUN pip install --no-cache-dir scikit-learn pandas numpy joblib flask
+COPY train_model.py /app/train_model.py
+RUN python3 /app/train_model.py
+
+
+
+FROM  python:3.11-slim AS runtime
+WORKDIR /app
+RUN pip install --no-cache-dir scikit-learn numpy joblib flask
+COPY --from=builder /app/model.pkl /app/model.pkl
+COPY serve.py /app/serve.py
+EXPOSE 8080
+CMD ["python3", "/app/serve.py"]
+
+```
+
+```shell
+# build the image
+docker build -t ml-serve:v1 .
+```
+
+
+```shell
+# Validate it 
+docker images ml-serve:v1 lists the built image; docker run --rm -p 8090:8080 ml-serve:v1
+
+# On new tab
+curl localhost:8090/health
+```
