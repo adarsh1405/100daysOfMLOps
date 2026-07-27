@@ -651,3 +651,26 @@ docker images ml-serve:v1 lists the built image; docker run --rm -p 8090:8080 ml
 # On new tab
 curl localhost:8090/health
 ```
+
+
+
+### Day 52
+> Fix a Broken Jupyter + MLflow + SeaweedFS Compose Stack
+
+```yaml
+jupyter
+  command: "start-notebook.sh --ServerApp.token='' --ServerApp.password=''"
+seaweedfs
+      - "9000:8333" # S3 API
+      - "9001:8888" # Filer UI
+```
+
+```shell
+docker compose up -d 
+docker compose ps
+```
+
+```
+verify by opening all the 3 UI
+```
+
