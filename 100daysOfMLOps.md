@@ -674,3 +674,33 @@ docker compose ps
 verify by opening all the 3 UI
 ```
 
+
+
+### Day 53
+> Fix a Broken PyTorch Dockerfile (CPU-Wheel URL)
+
+
+```dockerfile
+RUN pip install --no-cache-dir \
+    --index-url https://download.pytorch.org/whl/cpu \
+    torch
+
+CMD ["python3", "-c", "import torch; print(torch.__version__, 'cuda?', torch.cuda.is_available())"]
+
+```
+
+
+```shell
+# build the image
+docker build -t dl-trainer:v1 .
+```
+
+```shell
+# list the image
+docker images dl-trainer:v1
+```
+
+```shell
+# verify the image
+docker run --rm dl-trainer:v1
+```
