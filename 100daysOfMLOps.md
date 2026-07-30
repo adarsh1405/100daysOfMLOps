@@ -704,3 +704,83 @@ docker images dl-trainer:v1
 # verify the image
 docker run --rm dl-trainer:v1
 ```
+
+
+
+### Day 54
+> Push ML Model Images to Container Registry
+
+```shell
+REGISTRY="localhost:5555"
+docker tag "$IMAGE" "$REGISTRY/$IMAGE"
+docker push "$REGISTRY/$IMAGE"
+```
+
+```shell
+# validate 
+root@controlplane ~/code/ml-registry via 🐍 v3.12.3 ➜ curl http://localhost:5555/v2/_catalog
+{"repositories":["fraud-detector"]}
+
+root@controlplane ~/code/ml-registry via 🐍 v3.12.3 ➜  curl http://localhost:5555/v2/fraud-detector/tags/list
+{"name":"fraud-detector","tags":["v1"]}
+
+```
+
+
+### Day 55
+> Fix a Broken Dockerfile HEALTHCHECK and EXPOSE
+
+```Dockerfile
+EXPOSE 8085
+
+HEALTHCHECK --interval=5s --timeout=3s --start-period=3s --retries=3 \
+  CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:8085/health')" || exit 1
+
+```
+
+```shell
+docker build -t ml-health:v1 .
+
+docker inspect --format '{{.Config.ExposedPorts}}' ml-health:v1
+
+docker run ml-health:v1
+
+```
+
+### Day 56
+> Fix a Docker CI Pipeline with Git-SHA Tagging
+
+```shell 
+# build.sh
+REGISTRY="localhost:5555"
+
+
+# --- Stage 1: test
+python3 -m pytest app/test_app.py
+
+
+# --- Stage 3: tag with short git SHA
+SHA=$(git -C app rev-parse --short HEAD)
+TAGGED="$REGISTRY/$IMAGE:$SHA"
+```
+
+
+### Day 57
+> Serve an ML Model with Flask
+
+```python
+# appy.py
+
+payload = request.get_json() or {}
+amount = float(payload.get("amount", 0.0))
+hour = int(payload.get("hour", 0))
+num_tx_past_day = int(payload.get("num_tx_past_day", 0))
+features = np.array([[amount, hour, num_tx_past_day]])
+is_fraud = int(MODEL.predict(features)[0])
+return jsonify({"is_fraud": is_fraud}), 200
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8085)
+```
+
