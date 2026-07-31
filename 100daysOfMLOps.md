@@ -784,3 +784,71 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8085)
 ```
 
+
+
+### Day 58
+> Serve an ML Model with FastAPI
+
+```python
+# TODO 1
+amount: float
+hour: int = Field(ge=0, le=23)
+num_tx_past_day: int = Field(ge=0)
+
+
+# TODO 2
+feature = [[req.amount, req.hour, req.num_tx_past_day]]
+is_fraud = int(MODEL.predict(feature)[0])
+prediction_history.append({
+    "amount": req.amount, 
+    "hour": req.hour, 
+    "num_tx_past_day": req.num_tx_past_day,
+    "is_fraud": is_fraud
+})
+return PredictResponse(is_fraud=is_fraud)
+```
+
+```shell
+# To run the fastAPI server
+uvicorn app:app --host 0.0.0.0 --port 8085
+```
+
+### Day 59
+> Run Batch Predictions on a Dataset
+
+```python
+model = joblib.load(MODEL_PATH)
+
+df = pd.read_csv(INPUT_CSV)
+features = df[["amount", "hour", "num_tx_past_day"]]
+
+df["prediction"] = model.predict(features)
+
+df.to_csv(OUTPUT_CSV,index=False)
+print(f"Wrote {len(df)} rows to {OUTPUT_CSV}")
+
+```
+
+### Day 60
+> Package a Model as a BentoML Service
+
+```python
+features = np.array([[amount, hour, num_tx_past_day]])
+is_fraud = int(self.model.predict(features)[0])
+self._history.append({
+    "amount": amount, 
+    "hour": hour, 
+    "num_tx_past_day": num_tx_past_day,
+    "is_fraud": is_fraud
+})
+return {"is_fraud": is_fraud}
+```
+
+```shell
+bentoml serve service:FraudService
+```
+
+### Day 61
+> Deploy a Model-Serving Container via Portainer
+
+
