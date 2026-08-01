@@ -848,7 +848,7 @@ return {"is_fraud": is_fraud}
 bentoml serve service:FraudService
 ```
 
-### Day 61
+### Day 61 (Need practice)
 > Deploy a Model-Serving Container via Portainer
 
-
+`DO it from the UI`
