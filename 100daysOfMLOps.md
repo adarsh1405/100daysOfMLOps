@@ -852,3 +852,60 @@ bentoml serve service:FraudService
 > Deploy a Model-Serving Container via Portainer
 
 `DO it from the UI`
+
+
+
+
+
+
+### Day 62
+> Implement A/B Testing for Model Deployment
+
+```python
+    if random.random() < 0.8 :
+        model = MODEL_V1
+        version ="v1"
+    else :
+        model = MODEL_V2
+        version ="v2"
+
+    is_fraud = int(model.predict(features)[0])
+    return jsonify({"is_fraud": is_fraud, "model_version": version}), 200
+```
+
+```shell
+# for verification
+curl -X POST http://localhost:8085/predict \
+     -H "Content-Type: application/json" \
+     -d '{
+       "amount": 250.75,
+       "hour": 14,
+       "num_tx_past_day": 3
+     }'
+```
+
+
+### Day 63
+> Async Predictions with a Redis-Backed Worker
+
+```python
+# TODO 1
+REDIS.set(RESULT_KEY.format(task_id=task_id), is_fraud, ex=RESULT_TTL_SECONDS)
+```
+```python
+# TODO 2
+stored = REDIS.get(RESULT_KEY.format(task_id=task_id))
+if stored is None:
+    return jsonify({"task_id": task_id, "status": "pending"}), 202
+return jsonify({"task_id": task_id, "is_fraud": int(stored)}), 200
+```
+
+```shell
+curl -X POST http://localhost:8085/predict-async \
+     -H "Content-Type: application/json" \
+     -d '{
+       "amount": 250.75,
+       "hour": 14,
+       "num_tx_past_day": 3
+     }'
+```
