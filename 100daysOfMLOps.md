@@ -981,3 +981,61 @@ elif self.phase == 3 :
     self.v1_weight=0.00
     self.v2_weight=1.00
 ```
+
+
+
+
+### Day 66
+> Production Model Serving with Docker Compose
+
+
+docker-compose.yaml
+
+
+```python
+app = Flask(__name__)
+metrics=PrometheusMetrics(app)
+```
+
+```yaml
+# prometheus.yaml
+scrape_configs:
+  - job_name: model-api
+    static_configs:
+      - targets:
+          - model-api:5000
+
+```
+
+
+```json
+// nginx.conf
+http {
+    upstream model_backend {
+        server model-api:5000;
+    }
+```
+
+```shell
+docker compose up -d
+docker ps
+```
+
+`create a dashboard in grafana & save `
+
+
+```shell
+# to validate
+curl -s -o /dev/null -w '%{http_code}\n' http://localhost:5000/metrics
+
+curl -s -X POST -H 'Content-Type: application/json' \
+  -d '{"amount":3200,"hour":23,"num_tx_past_day":5}' \
+  http://localhost:8085/predict
+
+curl -s http://localhost:9090/api/v1/targets | python3 -m json.tool | head -30
+
+curl -u admin:grafana2026 http://localhost:3000/api/datasources
+
+curl -u admin:grafana2026 http://localhost:3000/api/search?type=dash-db
+
+```
