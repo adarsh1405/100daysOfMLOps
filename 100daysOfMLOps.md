@@ -909,3 +909,75 @@ curl -X POST http://localhost:8085/predict-async \
        "num_tx_past_day": 3
      }'
 ```
+
+
+
+
+
+### Day 64 - (good one)
+> Serve Multiple Models Behind Unified API Gateway
+
+```yaml
+# docker-compose.yaml
+recommend:
+  build: ./recommend
+  container_name: mm-recommend
+```
+
+```json
+upstream recommend_backend {
+    server recommend:5000;
+}
+.
+.
+.
+location /recommend/ {
+    proxy_pass http://recommend_backend/;
+}
+
+```
+
+```shell
+# for validation
+curl -X POST http://localhost:8085/fraud/predict \
+     -H "Content-Type: application/json" \
+     -d '{
+       "amount": 250.75,
+       "hour": 14,
+       "num_tx_past_day": 3
+     }'
+
+
+curl -X POST http://localhost:8085/churn/predict \
+     -H "Content-Type: application/json" \
+     -d '{
+       "tenure_days": 75,
+       "support_ticket": 14
+     }'
+
+curl -X POST http://localhost:8085/recommend/predict \
+     -H "Content-Type: application/json" \
+     -d '{
+       "user_id": 75
+     }'
+```
+
+
+### Day 65
+> Simulate a Canary Rollout for Model Updates
+
+
+```python
+
+ROLLBACK_THRESHOLD = 0.05
+
+if self.phase == 1 :
+    self.v1_weight=0.95
+    self.v2_weight=0.05
+elif self.phase == 2 :
+    self.v1_weight=0.70
+    self.v2_weight=0.30
+elif self.phase == 3 :
+    self.v1_weight=0.00
+    self.v2_weight=1.00
+```
