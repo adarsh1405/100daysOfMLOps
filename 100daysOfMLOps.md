@@ -1056,3 +1056,13 @@ curl -u admin:grafana2026 http://localhost:3000/api/search?type=dash-db
 > Build a Grafana Time-Series Panel for Prediction Accuracy
 
 - Create a Dashboard using UI 
+
+
+### Day 69
+> Build a Grafana Table Panel for Per-Feature Data Drift
+
+- Create a Dashboard using UI 
+
+
+### Day 70
+> Enforce Accuracy Gates with an Evidently Test Suite and a Grafana Alert
