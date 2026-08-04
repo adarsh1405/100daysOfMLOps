@@ -1039,3 +1039,20 @@ curl -u admin:grafana2026 http://localhost:3000/api/datasources
 curl -u admin:grafana2026 http://localhost:3000/api/search?type=dash-db
 
 ```
+
+
+
+
+### Day 67
+> Add Prometheus as a Grafana Data Source
+
+
+- Add datasource 'prometheus` from the UI
+- give `http://prometheus:9090` as URL
+- Create a Dashboard with prometheus. (It can be anything)
+
+
+### Day 68
+> Build a Grafana Time-Series Panel for Prediction Accuracy
+
+- Create a Dashboard using UI 
