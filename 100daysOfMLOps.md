@@ -1064,5 +1064,88 @@ curl -u admin:grafana2026 http://localhost:3000/api/search?type=dash-db
 - Create a Dashboard using UI 
 
 
-### Day 70
+### Day 70 (Hard)
 > Enforce Accuracy Gates with an Evidently Test Suite and a Grafana Alert
+
+```python
+METRICS.append(DatasetMissingValueCount(tests=[lt(10)]))
+METRICS.append(Accuracy(tests=[gt(0.80)]))
+```
+
+- create the alert from the UI
+- avg_over_time(prediction_accuracy[1m]) < 0.80
+
+
+```shell
+curl -s -u admin:grafana2026 http://localhost:3000/api/v1/provisioning/alert-rules \
+  | python3 -m json.tool | head -80
+```
+
+### Day 71
+> Build a 4-Panel Model-Overview Grafana Dashboard
+
+- Create 4 dashboards from the UI
+- 2 timesseries , 1 stat , 1 bar gauge
+
+
+### Day 72
+> Configure a Grafana Contact Point and Notification Policy
+
+
+- Create Contact point from the UI
+- Create Notification policiy by adding route in UI (bit tricky)
+
+```shell
+# Validation
+curl -s -u admin:grafana2026 http://localhost:3000/api/v1/provisioning/contact-points \
+  | python3 -m json.tool
+
+curl -s -u admin:grafana2026 http://localhost:3000/api/v1/provisioning/policies \
+  | python3 -m json.tool
+```
+
+
+### Day 73
+> Promote a Retrained Model via a Champion/Challenger Gate
+
+```python
+champion_version = client.get_model_version_by_alias(MODEL, PROD_ALIAS)
+champion = f1_of(champion_version.version)
+challenger = f1_of(CHALLENGER_VERSION)
+
+if champion < challenger:
+    client.set_registered_model_alias(MODEL, PROD_ALIAS, CHALLENGER_VERSION)
+else:
+    print("The challenger was rejected")
+```
+
+```shell
+# Validate
+python promote.py
+```
+
+### Day 74 (Hard)
+> Add a Custom Business Metric and a Grafana Version Variable
+```python
+FRAUD_AMOUNT = Counter(
+    "fraud_amount_usd_total",
+    "Total Fraud amount captured",
+    labelnames=["version"],
+    registry=REGISTRY,
+)
+
+# line 71
+FRAUD_AMOUNT.labels(version=version).inc(random.uniform(50, 500))
+```
+
+```shell
+docker compose restart metric-emitter
+
+
+
+curl -s 'http://localhost:9090/api/v1/query?query=fraud_amount_usd_total' \
+  | python3 -m json.tool
+
+```
+
+- Create a dashboard , but before that create a variable
