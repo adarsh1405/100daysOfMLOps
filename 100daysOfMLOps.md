@@ -1149,3 +1149,70 @@ curl -s 'http://localhost:9090/api/v1/query?query=fraud_amount_usd_total' \
 ```
 
 - Create a dashboard , but before that create a variable
+
+
+
+
+### Day 75 (Hard)
+> Fix and Complete an End-to-End Monitoring Stack: Prometheus, Grafana, Evidently
+
+```yaml
+# prometheus.yaml
+# Change to 5000 port
+scrape_configs:
+  - job_name: metric-emitter
+    static_configs:
+      - targets:
+          - metric-emitter:5000
+```
+
+```python
+# app/metrics-emitter.py
+# changed to /metrics
+@app.route("/metrics")
+def metrics():
+    return generate_latest(REGISTRY), 200, {"Content-Type": CONTENT_TYPE_LATEST}
+```
+
+```yaml
+# /grafana/promethus.yaml
+# fixed the port to 9090
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+```
+
+```shell
+docker compose restart
+
+curl -v http://localhost:5000/metrics
+
+curl http://localhost:9090/api/v1/targets  | python3 -m json.tool
+
+curl -s -u admin:grafana2026 http://localhost:3000/api/datasources \
+  | python3 -m json.tool
+```
+
+
+- Create 3 panels in a dashboard
+- Create tags for the dashboard
+
+```shell
+# verify the dashboard creation
+DASH_UID=$(curl -s -u admin:grafana2026 'http://localhost:3000/api/search?type=dash-db' \
+  | python3 -c "import json, sys; print(json.load(sys.stdin)[0]['uid'])")
+curl -s -u admin:grafana2026 http://localhost:3000/api/dashboards/uid/$DASH_UID \
+  | python3 -c "
+import json, sys
+d = json.load(sys.stdin)['dashboard']
+print('title:', d.get('title'))
+print('tags: ', d.get('tags'))
+for p in d.get('panels', []):
+    expr = (p['targets'][0].get('expr') if p.get('targets') else '-')
+    print(f\"{p['type']:12s} | {p['title']:30s} | {expr}\")
+"
+```
