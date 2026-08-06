@@ -1239,3 +1239,38 @@ git commit -m "Updated workflow"
 git push origin add-ci
 ```
 - Create PR & merge it
+
+
+
+
+### Day 77
+> Fix a Failing Data-Quality Job in Gitea Actions
+
+```yaml
+# Correct the .py file
+data-quality:
+  steps:
+      run: python3 -m pytest tests/test_data_quality.py -v
+```
+
+```shell
+git add .
+git commit -m "Updated workflow"
+git push origin add-data-validation
+```
+
+
+### Day 78
+> Parallelise Tests via a Gitea Actions Matrix Strategy
+
+```yaml
+# Add the Strategy & update the run script
+test:
+  runs-on: ubuntu-latest
+  strategy:
+    matrix:
+      suite: [train, data_quality, model_contract]
+  steps:
+    - name: Run all tests
+      run: python3 -m pytest tests/test_${{ matrix.suite }}.py -v
+```
