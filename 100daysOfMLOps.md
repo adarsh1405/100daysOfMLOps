@@ -1216,3 +1216,26 @@ for p in d.get('panels', []):
     print(f\"{p['type']:12s} | {p['title']:30s} | {expr}\")
 "
 ```
+
+
+
+### Day 76
+> Create CI Pipeline for ML Code Linting and Testing
+
+- rename `ci.yaml.template` to `ci.yml`
+
+```yaml
+- name: Run ruff
+        run: ruff check src tests # TODO: lint `src` and `tests` with ruff
+
+- name: Run pytest
+        run: python3 -m pytest tests -v # TODO: run pytest on the tests/ directory with verbose output
+```
+
+```shell
+git checkout -b add-ci
+git add .
+git commit -m "Updated workflow"
+git push origin add-ci
+```
+- Create PR & merge it
