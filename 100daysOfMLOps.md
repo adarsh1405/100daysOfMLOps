@@ -1274,3 +1274,43 @@ test:
     - name: Run all tests
       run: python3 -m pytest tests/test_${{ matrix.suite }}.py -v
 ```
+
+
+
+### Day 79
+> Publish CI Training Artefacts via upload-artifact
+
+```yaml
+- name: Upload training artefacts
+  uses: actions/upload-artifact@v3
+  with:
+    name: model-report
+    path: artifacts/
+```
+
+### Day 80
+> Wire Repository Secrets into a Gitea Actions Workflow
+
+- Create Action secrets from the gitea UI
+
+```yaml
+  register:
+    runs-on: ubuntu-latest
+    env: 
+      MLFLOW_TRACKING_URI: {{ secrets.MLFLOW_TRACKING_URI }}
+      MLFLOW_TOKEN: {{ secrets.MLFLOW_TOKEN }}
+```
+
+- Create PR & Merge
+
+```shell
+TOKEN=$(cat /root/.gitea/token)
+
+curl -s -H "Authorization: token $TOKEN" \
+  http://localhost:3000/api/v1/repos/gitea-admin/fraud-detector/actions/secrets \
+  | python3 -m json.tool
+
+curl -s http://localhost:5000/api/2.0/mlflow/registered-models/get?name=fraud-detector \
+  | python3 -m json.tool | head -30
+
+```
