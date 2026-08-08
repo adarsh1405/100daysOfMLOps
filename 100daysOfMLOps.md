@@ -1314,3 +1314,54 @@ curl -s http://localhost:5000/api/2.0/mlflow/registered-models/get?name=fraud-de
   | python3 -m json.tool | head -30
 
 ```
+
+
+
+
+### Day 81
+> Tag a Release and Publish to the Gitea Package Registry
+
+```yaml
+- name: Build image
+  run: |
+    echo "TODO 1: build and tag the image for the registry"
+    docker build -t $REGISTRY/$IMAGE:${{ steps.version.outputs.VERSION }} .
+
+# TODO 2: Push the image tagged in TODO 1 to the Gitea container
+# registry so it lands under the repo's Packages.
+- name: Push image to Gitea registry
+  run: |
+    echo "TODO 2: publish the tagged image to the registry"
+    docker push "$REGISTRY/$IMAGE:${{ steps.version.outputs.VERSION }}"
+```
+
+```shell
+git add .
+git commit -m "updated workflow"
+git push
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+### Day 82
+> Compose Gitea Workflows via workflow_call
+
+
+```yaml
+jobs:
+  lint:
+    uses: ./.gitea/workflows/lint.yml
+
+  test:
+    uses: ./.gitea/workflows/test.yml
+
+  report:
+    uses: ./.gitea/workflows/report.yml
+```
+- Commit & merge 
+
+
+### Day 83
+> Revert a Broken ML Release via the Gitea Revert Button
+
+
