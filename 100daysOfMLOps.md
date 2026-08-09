@@ -1393,3 +1393,30 @@ test:
   - Enable Status Check: \*lint\* *\test\*
   - Enable merge
   - Save rule
+
+
+
+
+
+### Day 85
+> Submit Your First Argo Workflow
+
+
+ - Create a new workflow
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: train-hello-
+  namespace: argo
+spec:
+  entrypoint: train
+  templates:
+    - name: train
+      container:
+        image: alpine:3.20
+        command: [echo]
+        args: ["fraud-detector: training step complete"]
+
+````
