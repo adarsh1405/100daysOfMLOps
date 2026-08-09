@@ -1366,3 +1366,30 @@ jobs:
 
 
 - Revert the PR & merge it to main 
+
+
+
+
+### Day 84
+> Enforce Branch Protection on the main Branch
+
+```yaml
+test:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+    - name: install pytest + runtime deps
+      run: pip install --break-system-packages pytest pandas numpy scikit-learn joblib
+    - name: run the suite
+      run: python3 -m pytest tests -v
+
+```
+
+- Commit & merge to main branch
+- Go to Gitea setting > branch
+  - Protected Branch Name Pattern: "main"
+  - Whitelist Restricted Push: "Selected"
+  - Pull Request Approvals: "1"
+  - Enable Status Check: \*lint\* *\test\*
+  - Enable merge
+  - Save rule
