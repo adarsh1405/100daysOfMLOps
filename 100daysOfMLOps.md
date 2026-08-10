@@ -1420,3 +1420,20 @@ spec:
         args: ["fraud-detector: training step complete"]
 
 ````
+
+
+
+
+### Day 86
+> Fix a Broken Argo DAG Dependency Chain
+
+```yaml
+# training-workflow.yaml
+# Add the dependencies line 
+- name: evaluate
+  template: evaluate
+  dependencies: [train]
+````
+
+- Run a new job , by cpoying all the workflow contents & pasting them in UI
+
