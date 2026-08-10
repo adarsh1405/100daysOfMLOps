@@ -1437,3 +1437,40 @@ spec:
 
 - Run a new job , by cpoying all the workflow contents & pasting them in UI
 
+
+
+
+### Day 87
+> Pass Data Between Argo Steps with Output Parameters and Branching
+
+
+```yaml
+### TODO 1
+- name: evaluate
+  script:
+    image: alpine:3.19
+    command: [sh]
+    source: |
+      # Deterministic score -- MLOps-not-ML. Teaching point is the
+      # parameter plumbing, not the score itself.
+      echo "0.75" > /tmp/score.txt
+      echo "[evaluate] score=0.75"
+  outputs:
+    parameters:
+      - name: score
+        valueFrom: 
+          path: /tmp/score.txt
+```
+
+```yaml
+## TODO 2
+- name: register
+  template: register
+  when: "{{=asFloat(steps.evaluate.outputs.parameters.score) > asFloat(workflow.parameters.min_score)}}"
+            
+```
+
+
+`kubectl apply -n argo -f /root/code/argo/train-and-maybe-register.yaml`
+
+- Submit 2 jobs with two different min_score "0.99" or "0.5" , Ideally , it should be above & below "0.5"
