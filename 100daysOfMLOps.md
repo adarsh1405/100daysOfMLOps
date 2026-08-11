@@ -1474,3 +1474,58 @@ spec:
 `kubectl apply -n argo -f /root/code/argo/train-and-maybe-register.yaml`
 
 - Submit 2 jobs with two different min_score "0.99" or "0.5" , Ideally , it should be above & below "0.5"
+
+
+
+
+
+### Day 88
+> Fix a Missing @task Decorator in a Prefect Flow
+
+- Run the initial custom run
+- Edit the code
+  - Add this line before startnig of evaluate function `@task(name="evaluate")`
+- Run `./redeploy.sh`
+- Again run it post redployment
+
+
+
+### Day 89 (practice again)
+> Parallel Model Training with Argo withParam Fan-Out
+
+
+```yaml
+- - name: train
+    template: train-variant
+    arguments:
+      parameters:
+        - name: n_estimators
+          value: "{{item}}"
+    withParam: "{{workflow.parameters.estimators_list}}"
+- - name: pick-best
+    template: pick-best
+
+```
+
+- Run 1 workflow with a negative value , the workflow must fail
+- Run 2 : Workflow with all postive value , the workflow will pass
+
+
+### Day 90
+> Automated Retraining with Argo CronWorkflow
+
+
+```yaml
+# TODO 1
+schedules:
+  - "* * * * *"
+```
+
+```yaml
+# TODO 2
+echo "[retrain] $(date -u +%FT%TZ)"
+exit 0
+
+```
+
+`kubectl apply -f fraud-retraining.yaml`
