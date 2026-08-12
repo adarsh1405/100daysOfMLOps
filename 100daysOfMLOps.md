@@ -1584,5 +1584,40 @@ ports:
 ```
 
 
+
 ### Day 93
 > Fix a Broken HorizontalPodAutoscaler scaleTargetRef
+
+```yaml
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    # scaleTargetRef bug -- real name is `fraud-server`.
+    name: fraud-server
+```
+
+### Day 94
+> Fix a Broken KServe InferenceService storageUri
+
+```yaml
+model:
+  modelFormat:
+    name: sklearn
+  # storageUri bug: the real PVC is named `model-storage`.
+  storageUri: "pvc://model-storage/"
+```
+
+
+### Day 95
+> Complete a Kubeflow Pipeline and Run It via the KFP UI
+
+```python
+def fraud_training_pipeline():
+    prep = prep_data()
+    train().after(prep)
+```
+
+- run the python file
+- Download the artefact to the local machine
+- Create a workflow named "fraud-training"  , run the workflow
