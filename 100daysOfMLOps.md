@@ -1529,3 +1529,60 @@ exit 0
 ```
 
 `kubectl apply -f fraud-retraining.yaml`
+
+
+
+
+### Day 91 (Good one)
+> Production ML Pipeline: Argo Workflows + MLflow on Kubernetes
+
+```yaml
+value: "{{steps.train.outputs.parameters.run_id}}"
+```
+
+- Run the pipeline
+- it will fail 
+```shell
+# This is the error
+raise MlflowException(f"API request to {url} failed with exception {e}")
+mlflow.exceptions.MlflowException: API request to http://mlflow.default.svc.cluster.local:5000/api/2.0/mlflow/experiments/get-by-name failed with exception HTTPConnectionPool(host='mlflow.default.svc.cluster.local', port=5000): Max retries exceeded with url: /api/2.0/mlflow/experiments/get-by-name?experiment_name=fraud-detector (Caused by NameResolutionError("HTTPConnection(host='mlflow.default.svc.cluster.local', port=5000): Failed to resolve 'mlflow.default.svc.cluster.local' ([Errno -2] Name or service not known)"))
+```
+
+- Edit the yaml & run it again
+
+```yaml
+# TODO 2 
+# Mlflow is running on mlflow "namespace"
+# Update in both places
+env:
+  - name: MLFLOW_TRACKING_URI
+    value: http://mlflow.mlflow.svc.cluster.local:5000
+```
+
+```yaml
+spec:
+  workflowSpec:
+    arguments: {}
+    workflowTemplateRef:
+      name: fraud-training-pipeline
+
+```
+
+- Run the workflowtemplate
+
+
+### Day 92
+> Fix a Service targetPort Mismatch on a Kubernetes Deployment
+
+```yaml
+ports:
+  - port: 8080
+    # targetPort bug -- nginx:alpine listens on 80, not 8080.
+    targetPort: 80
+    nodePort: 30092
+
+```
+
+
+### Day 93
+> Fix a Broken HorizontalPodAutoscaler scaleTargetRef
