@@ -1621,3 +1621,10 @@ def fraud_training_pipeline():
 - run the python file
 - Download the artefact to the local machine
 - Create a workflow named "fraud-training"  , run the workflow
+
+
+
+### Day 96
+> Deploy a GitOps Application via the ArgoCD NEW APP Form
+
+- Create the workflow via UI
