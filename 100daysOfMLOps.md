@@ -1628,3 +1628,26 @@ def fraud_training_pipeline():
 > Deploy a GitOps Application via the ArgoCD NEW APP Form
 
 - Create the workflow via UI
+
+
+### Day 97: Capstone (1/4)
+> End-to-End MLOPs System — Train, Register, Serve
+
+```python
+mv = mlflow.register_model(model_uri=f"runs:/{run_id}/model", name=MODEL_NAME)
+client.set_registered_model_alias(MODEL_NAME,ALIAS, mv.version)
+print(f"[register] promoted {MODEL_NAME} v{mv.version} -> @{ALIAS}")
+```
+- run train.py
+- run register.py
+- run serve.py
+
+
+
+```shell
+curl -X POST http://localhost:8085/predict \
+     -H "Content-Type: application/json" \
+     -d '{
+       "features": [100.5,12,3]
+     }'
+```
