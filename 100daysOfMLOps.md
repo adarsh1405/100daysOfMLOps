@@ -1651,3 +1651,92 @@ curl -X POST http://localhost:8085/predict \
        "features": [100.5,12,3]
      }'
 ```
+
+
+### Day 97: Capstone (1/4)
+> End-to-End MLOPs System — Train, Register, Serve
+
+```python
+mv = mlflow.register_model(model_uri=f"runs:/{run_id}/model", name=MODEL_NAME)
+client.set_registered_model_alias(MODEL_NAME,ALIAS, mv.version)
+print(f"[register] promoted {MODEL_NAME} v{mv.version} -> @{ALIAS}")
+```
+- run train.py
+- run register.py
+- run serve.py
+
+
+
+```shell
+curl -X POST http://localhost:8085/predict \
+     -H "Content-Type: application/json" \
+     -d '{
+       "features": [100.5,12,3]
+     }'
+```
+
+
+### Day 98: Capstone (2/4): 
+> Monitoring and Automated Retraining
+
+```python
+# TODO 1
+if not drifted:
+    print("no retraining is needed")
+    sys.exit(0)
+
+# TODO 2
+mv = mlflow.register_model(f"runs:/{run_id}/model", MODEL_NAME)
+client.set_registered_model_alias(MODEL_NAME,ALIAS,mv.version)
+
+```
+
+
+### Day 99: Capstone (3/4): 
+> GitOps Continuous Deployment with ArgoCD
+
+
+
+
+```yaml
+# application.yaml
+# Filled the TODOs
+spec:
+  project: default
+  source:
+    repoURL: "http://gitea-http.gitea.svc.cluster.local:3000/gitops-admin/mlops-deploy.git"     # TODO: the mlops-deploy repository's git URL
+    targetRevision: HEAD
+    path: "manifests"           # TODO: the folder in the repo holding the manifests
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: "default"      # TODO: the namespace the manifests deploy into
+```
+- Apply the application 
+- `kubectl apply -f application.yaml`
+
+- Go argoUI , sync it 
+- Update the image version
+- Then sync it , new pod should come
+
+
+```yaml
+# deplyment.yaml
+# changed image version
+containers:
+  - name: fraud-detector
+    image: nginx:1.27-alpine
+    ports:
+      - containerPort: 80
+```
+`curl -s -o /dev/null -w 'app=%{http_code}\n' http://localhost:8085/`
+
+
+
+### Day 100: Capstone (4/4): 
+> Close the Loop with Prometheus + Grafana Observability
+
+Do all tasks from UI
+
+- Add prometheus datdasources
+- Create 2 dashboards
+- Create 1 alert
